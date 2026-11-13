@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FinanceLab — Calculators & Budget</title>
+<style>
+:root{--bg:#eef3f0;--card:#fff;--ink:#0d1b16;--mut:#5b6b64;--line:#d5e0da;--acc:#0a9f6a;--acc2:#c99a1d;--bad:#d64545;--glow:rgba(10,159,106,.25);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#050c0a;--card:rgba(14,30,25,.72);--ink:#e8f5ef;--mut:#8aa399;--line:#1c3a31;--acc:#2ee6a6;--acc2:#f5c451;--bad:#ff6b6b;--glow:rgba(46,230,166,.28);color-scheme:dark}}
+:root[data-theme=dark]{--bg:#050c0a;--card:rgba(14,30,25,.72);--ink:#e8f5ef;--mut:#8aa399;--line:#1c3a31;--acc:#2ee6a6;--acc2:#f5c451;--bad:#ff6b6b;--glow:rgba(46,230,166,.28);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden}
+.bg:before{content:"";position:absolute;inset:-40px;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:44px 44px;opacity:.45;animation:drift 18s linear infinite}
+.o{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;animation:float 14s ease-in-out infinite}
+.o1{width:380px;height:380px;background:var(--acc);top:-100px;left:-80px}
+.o2{width:340px;height:340px;background:var(--acc2);bottom:-100px;right:-60px;animation-delay:-6s}
+@keyframes drift{to{transform:translate(44px,44px)}}
+@keyframes float{50%{transform:translate(60px,40px) scale(1.15)}}
+@keyframes up{from{opacity:0;transform:translateY(16px)}}
+@keyframes mq{to{transform:translateX(-50%)}}
+@keyframes pulse{50%{transform:scaleY(.35)}}
+@keyframes beat{50%{box-shadow:0 0 0 10px transparent}}
+@keyframes shine{to{transform:translateX(260%)}}
+@keyframes flash{30%{background:var(--glow)}}
+.tick{overflow:hidden;border-bottom:1px solid var(--line);background:var(--card);backdrop-filter:blur(8px);white-space:nowrap;font:600 12px ui-monospace,Menlo,monospace}
+.tick div{display:inline-block;animation:mq 30s linear infinite;padding:7px 0}
+.tick span{margin:0 22px;color:var(--mut)}.tick b{color:var(--ink)}.u{color:var(--acc)}.d{color:var(--bad)}
+header{position:relative;padding:30px 20px 74px;max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px}
+#candles{position:absolute;left:20px;right:20px;bottom:0;height:70px;display:flex;align-items:flex-end;gap:5px;opacity:.22;pointer-events:none}
+#candles i{flex:1;background:var(--c);border-radius:2px;transform-origin:bottom;animation:pulse 3.2s ease-in-out infinite}
+.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:grid;place-items:center;box-shadow:0 0 0 0 var(--glow);animation:beat 2.4s infinite}
+.logo svg{width:26px;stroke:#04130d;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;animation:dash 2.4s ease-in-out infinite}
+@keyframes dash{0%{stroke-dashoffset:60}60%,100%{stroke-dashoffset:0}}
+h1{margin:0;font-size:26px;letter-spacing:-.5px}h1 em{font-style:normal;color:var(--acc)}
+header p{margin:0;color:var(--mut);font-size:13px}
+#th{margin-left:auto;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:17px}
+main{max-width:1080px;margin:-34px auto 40px;padding:0 20px;position:relative}
+.tabs{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:6px;backdrop-filter:blur(10px);width:max-content;max-width:100%;margin-bottom:20px}
+.tab{border:0;background:none;color:var(--mut);font-family:inherit;font-weight:600;font-size:14px;padding:10px 20px;border-radius:11px;cursor:pointer;position:relative;transition:.3s}
+.tab.on{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#04130d;box-shadow:0 6px 22px var(--glow)}
+.pn{display:none;animation:up .5s both}.pn.on{display:block}
+.chips{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 16px;border-radius:99px;cursor:pointer;font-family:inherit;font-weight:600;font-size:13px;transition:.25s}
+.chip:hover{transform:translateY(-2px);border-color:var(--acc)}.chip.on{border-color:var(--acc);color:var(--acc);box-shadow:0 0 18px var(--glow)}
+.gp{display:none}.gp.on{display:block;animation:up .5s both}
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px}
+.ac{margin-bottom:14px}
+.ah{width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 20px;color:var(--ink);font-family:inherit;font-weight:700;font-size:16px;cursor:pointer;backdrop-filter:blur(10px);transition:.3s}
+.ah:hover,.ac.open .ah{border-color:var(--acc);box-shadow:0 8px 28px var(--glow)}
+.ah span{flex:1}.ah em{font:600 15px ui-monospace,Menlo,monospace;font-style:normal;color:var(--acc)}
+.ah b{display:inline-block;color:var(--mut);transition:transform .4s}.ac.open .ah b{transform:rotate(180deg)}
+.ab{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s cubic-bezier(.2,.8,.2,1)}.ac.open .ab{grid-template-rows:1fr}
+.ai{overflow:hidden;min-height:0}.ai>.calc{padding-top:14px}
+@media(max-width:780px){.calc{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;backdrop-filter:blur(10px);transition:transform .3s,box-shadow .3s}
+.card:hover{box-shadow:0 12px 40px var(--glow)}
+.f{margin-bottom:16px}.f>span,.lbl{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut)}
+.in{display:flex;align-items:center;border:1px solid var(--line);border-radius:12px;padding:0 12px;margin:5px 0 8px;background:var(--bg);transition:.2s}
+.in:focus-within{border-color:var(--acc);box-shadow:0 0 0 3px var(--glow)}
+.in b{color:var(--acc);font-weight:600;margin-right:6px}
+input[type=number]{flex:1;min-width:0;border:0;background:none;color:var(--ink);font:600 17px ui-monospace,Menlo,monospace;padding:10px 0;outline:0}
+input[type=number]::-webkit-inner-spin-button{display:none}input[type=number]{-moz-appearance:textfield}
+select{flex:1;width:100%;border:0;background:none;color:var(--ink);font-family:inherit;font-weight:600;font-size:15px;padding:12px 0;outline:0;cursor:pointer}select option{background:var(--bg);color:var(--ink)}
+.in.ro{border-style:dashed;background:transparent}.rov{flex:1;font:600 17px ui-monospace,Menlo,monospace;padding:10px 0;color:var(--acc)}
+.f small{display:block;color:var(--mut);font-size:12px;margin:-2px 0 4px}
+.dp{display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:10px}.ai>.two{padding-top:14px}.kn{border-left:3px solid var(--acc2);padding-left:10px;margin:14px 0 8px}
+.chk{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mut);cursor:pointer}.chk input{accent-color:var(--acc);width:18px;height:18px}
+.big{font:700 clamp(34px,7vw,52px)/1.1 ui-monospace,Menlo,monospace;margin:4px 0 14px;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.split{display:flex;height:12px;border-radius:9px;overflow:hidden;background:var(--line);margin-bottom:8px}
+.split i{height:100%;transition:width .8s cubic-bezier(.2,.8,.2,1)}.split i:first-child{background:var(--acc)}.split i:last-child{background:var(--acc2)}
+.lg{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--mut);margin-bottom:14px;flex-wrap:wrap}.lg b{color:var(--ink);font-family:ui-monospace,Menlo,monospace}
+.rw{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}.rw b{font-family:ui-monospace,Menlo,monospace;white-space:nowrap}
+.bars{display:flex;align-items:flex-end;gap:3px;height:130px;margin:16px 0;border-bottom:1px solid var(--line)}
+.bar{flex:1;height:100%;display:flex;flex-direction:column-reverse}.bar i{display:block;height:0;transition:height .8s cubic-bezier(.2,.8,.2,1)}
+.bar i:first-child{background:var(--acc);border-radius:0 0 2px 2px}.bar i:last-child{background:var(--acc2);border-radius:3px 3px 0 0}
+.btn{width:100%;border:0;border-radius:13px;padding:13px;font-family:inherit;font-weight:700;font-size:14px;color:#04130d;background:linear-gradient(135deg,var(--acc),var(--acc2));cursor:pointer;position:relative;overflow:hidden;transition:transform .2s}
+.btn:hover{transform:translateY(-2px)}.btn:active{transform:scale(.98)}
+.btn:after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:rgba(255,255,255,.45);transform:skewX(-20deg);animation:shine 3s infinite}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:18px}
+.kpi{padding:16px}.kpi .v{font:700 26px ui-monospace,Menlo,monospace;margin-top:2px}
+.two{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:18px;margin-bottom:18px}
+@media(max-width:780px){.two{grid-template-columns:1fr}}
+.donut{position:relative;max-width:300px;margin:0 auto}.donut svg{width:100%;display:block}
+.donut circle{fill:none;stroke-width:24;transition:stroke-dasharray .9s cubic-bezier(.2,.8,.2,1),stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1)}
+.ctr{position:absolute;inset:0;display:grid;place-content:center;text-align:center}.ctr .v{font:700 28px ui-monospace,Menlo,monospace}
+.br{display:flex;align-items:center;gap:10px;padding:5px 8px;border-radius:12px}.br.fl{animation:flash 1.4s}
+.br i{width:12px;height:12px;border-radius:4px;flex:none}.br span{flex:1;font-size:14px}.br .in{margin:0;width:150px;padding:0 10px}.br input{font-size:15px;padding:7px 0}
+.sc{padding:18px;animation:up .6s both}.sc h3{margin:0 0 4px;font-size:15px}.sc .v{font:700 28px ui-monospace,Menlo,monospace;color:var(--acc);margin:2px 0 8px}.sc .e{color:var(--mut);font-size:13px}
+h2{font-size:17px;margin:22px 0 12px}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,120px);background:var(--acc);color:#04130d;font-weight:700;padding:12px 22px;border-radius:99px;transition:transform .45s cubic-bezier(.2,1.4,.4,1);box-shadow:0 10px 30px var(--glow);z-index:9}
+#toast.on{transform:translate(-50%,0)}
+.note{font-size:12px;color:var(--mut);margin-top:14px}.note button{background:none;border:0;color:var(--acc);cursor:pointer;font:inherit;text-decoration:underline}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div class="bg"><div class="o o1"></div><div class="o o2"></div></div>
+<div class="tick"><div id="tk"></div></div>
+<header><div id="candles"></div>
+<div class="logo"><svg viewBox="0 0 28 28"><path d="M3 21l7-7 5 5 10-12"/></svg></div>
+<div><h1>Finance<em>Lab</em></h1><p>Run the numbers, then lock in your budget</p></div>
+<button id="th" title="Toggle theme">◐</button></header>
+<main>
+<div class="tabs"><button class="tab on" data-t="calc">⚙ Calculators</button><button class="tab" data-t="res">📊 Results &amp; Budget</button></div>
+
+<div class="pn on" id="p-calc"><div class="chips" id="chips"></div><div id="calcs"></div>
+<p class="note">Amounts in CAD. Mortgage uses Canadian semi-annual compounding; CMHC premium is an estimate. These are planning tools, not financial advice.</p></div>
+
+<div class="pn" id="p-res">
+<div class="grid3" id="kp"></div>
+<div id="per"></div>
+<h2>Saved calculations</h2><div class="grid3" id="sc"></div>
+</div>
+</main>
+<div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const money=(x,d=0)=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD',maximumFractionDigits:d,minimumFractionDigits:d}).format(x);
+const pct=x=>(x*100).toFixed(1)+'%';
+function tw(el,to,f=money){const a=+el._v||0,t0=performance.now();el._v=to;(function s(t){const k=Math.min(1,(t-t0)/800),e=1-Math.pow(1-k,3);el.textContent=f(a+(to-a)*e);if(k<1)requestAnimationFrame(s)})(t0)}
+let S;try{S=JSON.parse(localStorage.getItem('fl2'))}catch(e){}
+S=S||{b:{income:5200,house:1900,car:0,carrun:0,food:650,util:220,ins:120,phone:90,subs:45,fun:260,save:450,other:150},s:{}};
+if(!S.v2){delete S.s.house;S.v2=1}
+S.b.car2=S.b.car2||0;S.b.car2run=S.b.car2run||0;['vac','wed','kid1','kid2'].forEach(k=>S.b[k]=S.b[k]||0);
+const sv=()=>{try{localStorage.setItem('fl2',JSON.stringify(S))}catch(e){}};
+// simulate a loan or savings plan year by year -> cumulative [base, extra]
+function loan(P,r,n,m,q=12){let b=P,pp=0,ip=0,y=[];for(let i=1;i<=n;i++){const it=b*r,pr=Math.min(m-it,b);b-=pr;pp+=pr;ip+=it;if(i%q==0||i==n)y.push([pp,ip])}return y}
+function grow(i0,mc,r,yrs){let b=i0,c=i0,y=[];for(let i=1;i<=yrs*12;i++){b=b*(1+r)+mc;c+=mc;if(i%12==0)y.push([c,b-c])}return y}
+const pmt=(P,r,n)=>r?P*r/(1-Math.pow(1+r,-n)):P/n;
+const C={
+car:{g:'loans',t:'🚗 Car 1 loan',main:'Monthly payment',leg:['Principal paid','Interest paid'],lab:['Amount financed','Total interest','Total loan cost','True monthly cost (with running costs)'],
+f:[['price','Vehicle price',5000,150000,500,35000,'$'],['down','Down payment / trade-in',0,80000,500,5000,'$'],['rate','Interest rate',0,20,.05,7.5,'%'],['term','Term (months)',12,96,12,72,'mo'],['run','Insurance, fuel & upkeep per month',0,2000,10,350,'$']],
+chk:['tax','Add Québec sales tax (14.975%)'],
+calc(v){const P=Math.max(v.price*(v.tax?1.14975:1)-v.down,0),r=v.rate/1200,m=pmt(P,r,v.term),T=m*v.term;
+return{m,r:[P,T-P,T,m+v.run],y:loan(P,r,v.term,m),bud:{car:m,carrun:v.run}}}},
+house:{g:'loans',t:'🏠 House mortgage',main:'Monthly mortgage payment',leg:['Principal paid','Interest paid'],lab:['Mortgage incl. CMHC premium','CMHC premium (est.)','Total interest','Monthly housing cost (all-in)'],
+f:[['price','Home price',0,0,0,475000,'$'],['down','Down payment (amount · percentage)',0,0,0,47500,'dp'],['ro','Remaining to finance (home price − down payment)',0,0,0,0,'ro'],['rate','Interest rate',0,0,0,4.5,'%'],['yrs','Amortization (years)',0,0,0,25,'yrs'],['freq','Payment frequency',0,0,0,0,'sel',['Monthly','Twice a month (semi-monthly)','Bi-weekly (every 2 weeks)','Accelerated bi-weekly']],['ex','Property tax, insurance & heating per month',0,0,0,450,'$']],
+calc(v){const dp=Math.min(v.down,v.price),rem=v.price-dp,pc=v.price?dp/v.price*100:0,cm=pc>=20?0:pc>=15?.028:pc>=10?.031:.04,P=rem*(1+cm),q=[12,24,26,26][v.freq],j=1+v.rate/200,rq=Math.pow(j,2/q)-1,m=v.freq==3?pmt(P,Math.pow(j,1/6)-1,v.yrs*12)/2:pmt(P,rq,v.yrs*q),n=v.freq==3?Math.ceil((rq?-Math.log(1-P*rq/m)/Math.log(1+rq):P/m)-1e-9):v.yrs*q,y=loan(P,rq,n,m,q),it=y[y.length-1][1],mm=m*q/12;
+return{m,ro:rem,pc,ml:['Monthly mortgage payment','Mortgage payment (twice a month)','Bi-weekly mortgage payment','Accelerated bi-weekly payment'][v.freq],u:['/mo',' twice a month',' bi-weekly',' accel. bi-weekly'][v.freq],hint:`Down payment = ${pc.toFixed(1)}% of price · paid off in ${(n/q).toFixed(1)} yrs`,r:[P,P-rem,it,mm+v.ex],y,bud:{house:mm+v.ex}}}},
+sav:{t:'📈 Savings growth',main:'Future value',leg:['Your contributions','Growth earned'],lab:['Total contributed','Growth earned','Growth multiple','Value in today’s dollars (2% inflation)'],
+f:[['i0','Starting amount',0,500000,500,5000,'$'],['mc','Monthly contribution',0,5000,25,400,'$'],['ret','Annual return',0,15,.1,6,'%'],['yrs','Years',1,40,1,20,'yrs']],
+calc(v){const y=grow(v.i0,v.mc,v.ret/1200,v.yrs),[c,g]=y[y.length-1];
+return{m:c+g,r:[c,g,c?(c+g)/c:0,(c+g)/Math.pow(1.02,v.yrs)],y,bud:{save:v.mc},x:1}}}};
+C.car2={...C.car,t:'🚙 Car 2 loan',calc(v){const R=C.car.calc(v);R.bud={car2:R.m,car2run:v.run};return R}};C.wed={t:'💍 Wedding',main:'Total wedding cost',leg:['Already saved','Still to save'],lab:['Venue & food (incl. service & tax)','Vendors & extras (incl. tax)','Cost per guest','Monthly savings needed'],
+f:[['guests','Number of guests',0,0,0,150,'guests'],['pg','Package price per guest',0,0,0,155,'$'],['svc','Service charge on the package',0,0,0,20,'%'],['venue','Venue / room rental',0,0,0,0,'$'],['photo','Photo & video',0,0,0,0,'$'],['music','Music / DJ / band',0,0,0,0,'$'],['decor','Flowers & décor',0,0,0,0,'$'],['attire','Attire, rings & beauty',0,0,0,0,'$'],['other','Everything else',0,0,0,0,'$'],['saved','Already saved for the wedding',0,0,0,0,'$'],['mo','Months until the wedding',0,0,0,10,'mo']],
+chk:['tax','Add Québec sales tax (14.975%)'],
+calc(v){const t=v.tax?1.14975:1,f=(v.guests*v.pg*(1+v.svc/100)+v.venue)*t,o=(v.photo+v.music+v.decor+v.attire+v.other)*t,T=f+o,sd=Math.min(v.saved,T),rem=T-sd,n=Math.max(Math.round(v.mo),1),nb=Math.min(n,40);
+return{m:T,r:[f,o,v.guests?T/v.guests:0,rem/n],s:[sd,rem],y:Array.from({length:nb},(_,i)=>{const a=sd+rem*(i+1)/nb;return[a,T-a]}),bud:{wed:rem/n}}}};
+const ORD=['car','car2','house','wed','sav'];
+const V={},L={};
+// build calculators
+ORD.forEach((k,ix)=>{const c=C[k],o0=(S.v||{})[k]||{};V[k]={tax:o0.tax===undefined?1:o0.tax};
+const gk=c.g||k;if(!$(`[data-k=${gk}]`)){const b=document.createElement('button');b.className='chip'+(ix?'':' on');b.textContent=c.g?'🏦 Loans — car & house':c.t;b.dataset.k=gk;$('#chips').append(b)}
+const p=document.createElement('section');p.className='calc';p.id='c-'+k;
+p.innerHTML=`<div class="card">${c.f.map(([id,l,a,z,s,d,u,o])=>{d=o0[id]===undefined?d:o0[id];V[k][id]=d;return`<div class="f"><span>${l}</span>`+(u=='sel'?`<div class="in"><select data-n="${id}">${o.map((t,i)=>`<option value="${i}">${t}</option>`).join('')}</select></div>`:u=='dp'?`<div class="dp"><div class="in"><b>$</b><input type="number" min="0" step="any" inputmode="decimal" value="${d}" data-n="${id}"></div><div class="in"><input type="number" min="0" max="100" step="any" inputmode="decimal" data-pc><b>%</b></div></div>`:u=='ro'?`<div class="in ro"><span class="rov" data-ro>$0</span><b>🔒</b></div><small data-h></small>`:`<div class="in"><b>${u=='$'?'$':''}</b><input type="number" min="0" step="any" inputmode="decimal" value="${d}" data-n="${id}"><b>${u!='$'?u:''}</b></div>`)+`</div>`}).join('')}${c.chk?`<label class="chk"><input type="checkbox" data-c="${c.chk[0]}" checked> ${c.chk[1]}</label>`:''}</div>
+<div class="card"><div class="lbl" data-ml>${c.main}</div><div class="big" data-m>$0</div><div class="split"><i></i><i></i></div>
+<div class="lg"><span>● ${c.leg[0]} <b data-l="0"></b></span><span>● ${c.leg[1]} <b data-l="1"></b></span></div>
+${c.lab.map((l,i)=>`<div class="rw"><span>${l}</span><b data-i="${i}">$0</b></div>`).join('')}
+<div class="bars">${'<div class="bar"><i></i><i></i></div>'.repeat(40)}</div>
+<button class="btn" data-save>Save to Results &amp; Budget →</button></div>`;
+p.querySelectorAll('select').forEach(s=>s.value=V[k][s.dataset.n]);const cb=p.querySelector('[data-c]');if(cb)cb.checked=!!V[k][cb.dataset.c];let G=$('#g-'+gk);if(!G){G=document.createElement('div');G.className='gp'+(ix?'':' on');G.id='g-'+gk;$('#calcs').append(G)}
+if(c.g){const a=document.createElement('div'),first=!G.children.length;a.className='ac'+(first?' open':'');a.id='a-'+k;a.innerHTML=`<button class="ah" aria-expanded="${first}"><span>${c.t}</span><em data-sum>$0/mo</em><b>▾</b></button><div class="ab"><div class="ai"></div></div>`;a.querySelector('.ai').append(p);G.append(a);
+a.querySelector('.ah').onclick=e=>{const o=a.classList.toggle('open');e.currentTarget.setAttribute('aria-expanded',o);if(o){p.querySelectorAll('.bar i').forEach(i=>i.style.height=0);setTimeout(()=>upd(k),80)}}}else G.append(p);
+p.addEventListener('input',e=>{const t=e.target;if(t.dataset.c){V[k][t.dataset.c]=t.checked;return upd(k)}if('pc' in t.dataset){const d=p.querySelector('[data-n=down]');V[k].down=Math.round(V[k].price*Math.min(parseFloat(t.value)||0,100))/100;d.value=V[k].down;return upd(k)}const id=t.dataset.n;if(!id)return;V[k][id]=parseFloat(t.value)||0;upd(k)});p.addEventListener('input',()=>{(S.v=S.v||{})[k]={...V[k]};sv()});p.addEventListener('change',e=>{if('pc' in e.target.dataset&&L[k])e.target.value=Math.round(L[k].pc)});
+p.querySelector('[data-save]').onclick=()=>{(S.v=S.v||{})[k]={...V[k]};S.s[k]={m:L[k].m,r:L[k].r,ml:L[k].ml};Object.assign(S.b,Object.fromEntries(Object.entries(L[k].bud).map(([a,z])=>[a,Math.round(z)])));sv();bi();rb();tick();toast('Saved — see the Results & Budget tab');Object.keys(L[k].bud).forEach(a=>$$(`[data-b=${a}]`).forEach(i=>{const r=i.closest('.br');r.classList.remove('fl');void r.offsetWidth;r.classList.add('fl')}))};
+setTimeout(()=>upd(k),150)});
+function upd(k){const c=C[k],p=$('#c-'+k);let R;try{R=c.calc(V[k])}catch(e){return}if(!isFinite(R.m)||R.r.some(x=>!isFinite(x)))return;L[k]=R;p.querySelector('[data-ml]').textContent=R.ml||c.main;tw(p.querySelector('[data-m]'),R.m,x=>money(x,['sav','wed'].includes(k)?0:2));const sm=$(`#a-${k} [data-sum]`);if(sm)tw(sm,R.m,x=>money(x,2)+(R.u||'/mo'));const ro=p.querySelector('[data-ro]');if(ro){tw(ro,R.ro);p.querySelector('[data-h]').textContent=R.hint}const pi=p.querySelector('[data-pc]');if(pi&&document.activeElement!==pi)pi.value=Math.round(R.pc);
+const last=R.s||R.y[R.y.length-1],tot=(last[0]+last[1])||1;
+p.querySelectorAll('.split i').forEach((e,i)=>e.style.width=last[i]/tot*100+'%');
+p.querySelectorAll('[data-l]').forEach((e,i)=>tw(e,last[i]));
+p.querySelectorAll('[data-i]').forEach((e,i)=>tw(e,R.r[i],i==2&&c.x?x=>x.toFixed(2)+'×':undefined));
+p.querySelectorAll('.bar').forEach((b,i)=>{const y=R.y[i];b.style.display=y?'flex':'none';if(y)[...b.children].forEach((s,j)=>s.style.height=y[j]/tot*100+'%')})}
+// tabs
+function show(g,id,attr){$$(g).forEach(x=>x.classList.toggle('on',x.dataset[attr]==id))}
+$$('.tab').forEach(b=>b.onclick=()=>{show('.tab',b.dataset.t,'t');$$('.pn').forEach(p=>p.classList.toggle('on',p.id=='p-'+b.dataset.t));if(b.dataset.t=='res'){cards();rb()}});
+$('#chips').onclick=e=>{const k=e.target.dataset.k;if(!k)return;show('.chip',k,'k');$$('.gp').forEach(p=>p.classList.toggle('on',p.id=='g-'+k));Object.keys(C).filter(x=>(C[x].g||x)==k).forEach(x=>upd(x))};
+// budget
+const B=[['income','Net income'],['house','Housing (rent / mortgage)'],['car','Car 1 payment'],['carrun','Car 1 insurance, fuel & upkeep'],['car2','Car 2 payment'],['car2run','Car 2 insurance, fuel & upkeep'],['food','Groceries & dining'],['util','Utilities (power, heat, water)'],['ins','Other insurance'],['phone','Phone & internet'],['subs','Subscriptions'],['fun','Fun & leisure'],['vac','Vacations'],['save','Savings & investing'],['wed','Wedding fund',2],['other','Everything else'],['kid1','Kid 1 — monthly cost',1],['kid2','Kid 2 — monthly cost',1]];
+const E=B.slice(1).map(x=>x[0]),CL=['#3b82f6','#8b5cf6','#ec4899','#f97316','#eab308','#14b8a6','#06b6d4','#a3e635','#f43f5e','#64748b','#d946ef','#0ea5e9','#fb7185','#22c55e','#f59e0b','#a855f7','#38bdf8'];
+const FL=Object.fromEntries(B.filter(r=>r[2]).map(r=>[r[0],r[2]])),ok=(k,x)=>!(FL[k]==1&&x<=12||FL[k]==2&&x>12);
+const CI=2*Math.PI*78,PD=[['m','Monthly',1,'/ month','📅'],['y','Yearly',12,'/ year','🗓️'],['d','10 years',120,'over 10 years','🔭']];
+$('#per').innerHTML=PD.map(([id,nm,x,u,ic],ix)=>`${x>12?'<p class="note kn">👶 Planning ahead: 2 kids are expected within 10 years. The 10-year view below has one monthly-cost entry per kid — they only count there.</p>':''}<div class="ac${ix?'':' open'}" id="pa-${id}"><button class="ah" aria-expanded="${!ix}"><span>${ic} ${nm}</span><em data-ps>$0</em><b>▾</b></button><div class="ab"><div class="ai"><div class="two"><div class="card"><div class="lbl">Where your income goes · ${nm.toLowerCase()}</div><div class="donut"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="78" stroke="var(--line)"/><g transform="rotate(-90 100 100)">${[...E,'left'].map((k,i)=>`<circle cx="100" cy="100" r="78" data-s="${k}" stroke="${k=='left'?'var(--acc)':CL[i]}" style="stroke-dasharray:0 ${CI}"/>`).join('')}</g></svg><div class="ctr"><div class="lbl" data-cl>left over</div><div class="v" data-cv>$0</div></div></div><div class="lg" data-dl style="margin-top:14px"></div></div><div class="card"><div class="lbl" style="margin-bottom:8px">${nm} budget — enter your exact numbers</div>${B.map(([k,l],i)=>!ok(k,x)?'':`<div class="br"><i style="background:${i?CL[i-1]:'var(--acc)'}"></i><span>${i?l:'<b>'+l+'</b>'}</span><div class="in"><b>$</b><input type="number" min="0" step="any" data-b="${k}" data-x="${x}"></div></div>`).join('')}${ix?'':'<p class="note">Figures start as samples. <button id="clr">Clear all to $0</button></p>'}${x>12?'<p class="note">Straight multiplication of your monthly numbers — no inflation, raises or investment growth. Each kid’s cost counts for all 120 months, and the wedding fund isn’t included.</p>':''}</div></div></div></div></div>`).join('');
+$('#per').onclick=e=>{const h=e.target.closest('.ah');if(!h)return;const a=h.parentNode,o=a.classList.toggle('open');h.setAttribute('aria-expanded',o);if(o){a.querySelectorAll('[data-s]').forEach(c=>c.style.strokeDasharray=`0 ${CI}`);setTimeout(rb,80)}};
+
+$('#kp').innerHTML=[['Planned spending per month','sp'],['Savings rate','sr'],['Left over per year','ly']].map(([l,i])=>`<div class="card kpi"><div class="lbl">${l}</div><div class="v" id="${i}">$0</div></div>`).join('');
+function bi(){$$('[data-b]').forEach(i=>{if(i!==document.activeElement)i.value=+(S.b[i.dataset.b]*i.dataset.x).toFixed(2)})}
+$('#per').addEventListener('input',e=>{const t=e.target,k=t.dataset.b;if(!k)return;S.b[k]=(parseFloat(t.value)||0)/t.dataset.x;sv();bi();rb()});
+$('#per').addEventListener('change',tick);
+$('#clr').onclick=()=>{E.concat('income').forEach(k=>S.b[k]=0);sv();bi();rb();tick()};
+function rb(){const b=S.b,sp=x=>E.reduce((a,k)=>a+(ok(k,x)?b[k]:0),0),ex=sp(1),left=b.income-ex;PD.forEach(([id,nm,x,u])=>{const w=$('#pa-'+id),ex=sp(x),left=b.income-ex,tot=Math.max(b.income,ex)||1;let off=0;
+[...E,'left'].forEach(k=>{const v=k=='left'?Math.max(left,0):ok(k,x)?b[k]:0,l=v/tot*CI,s=w.querySelector(`[data-s=${k}]`).style;s.strokeDasharray=`${Math.max(l-2,0)} ${CI}`;s.strokeDashoffset=-off;off+=l});
+const cv=w.querySelector('[data-cv]');tw(cv,Math.abs(left)*x);cv.style.color=left<0?'var(--bad)':'var(--acc)';w.querySelector('[data-cl]').textContent=(left<0?'over budget ':'left over ')+u;const ps=w.querySelector('[data-ps]');tw(ps,left*x,v=>v<0?money(-v)+' over':money(v)+' left');ps.style.color=left<0?'var(--bad)':'';w.querySelector('[data-dl]').innerHTML=`<span>Income <b>${money(b.income*x)}</b></span><span>Spending <b>${money(ex*x)}</b></span><span>Share used <b>${pct(b.income?ex/b.income:0)}</b></span>`});
+tw($('#sp'),ex);tw($('#sr'),b.income?b.save/b.income:0,pct);tw($('#ly'),left*12);$('#ly').style.color=left<0?'var(--bad)':'';
+}
+function cards(){$('#sc').innerHTML=ORD.map(k=>{const c=C[k],s=S.s[k];return`<div class="card sc"><h3>${c.t}</h3>`+(s?`<div class="lbl">${s.ml||c.main}</div><div class="v" data-sv="${k}">$0</div>`+c.lab.slice(0,3).map((l,i)=>`<div class="rw"><span>${l}</span><b>${i==2&&c.x?s.r[i].toFixed(2)+'×':money(s.r[i])}</b></div>`).join(''):`<div class="e">Nothing saved yet. Run this calculator and hit “Save”.</div>`)+'</div>'}).join('');
+$$('[data-sv]').forEach(e=>tw(e,S.s[e.dataset.sv].m,x=>money(x,['sav','wed'].includes(e.dataset.sv)?0:2)))}
+// ticker, toast, theme, candles
+function tick(){const b=S.b,it=[['INCOME',b.income,1],['HOUSING',b.house],['CARS',b.car+b.carrun+b.car2+b.car2run],['FOOD',b.food],['UTILITIES',b.util],['SAVINGS',b.save,1],['FUN',b.fun]],h=it.map(([n,v,u])=>`<span>${n} <b>${money(v)}</b> <i class="${u?'u':'d'}">${u?'▲':'▼'}</i></span>`).join('');$('#tk').innerHTML=h+h+h+h}
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2600)}
+$('#th').onclick=()=>{const r=document.documentElement,d=(r.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))=='dark';r.dataset.theme=d?'light':'dark'};
+for(let i=0;i<46;i++){const e=document.createElement('i');e.style.cssText=`height:${20+Math.random()*80}%;animation-delay:${-i*.17}s;--c:${Math.random()>.4?'var(--acc)':'var(--bad)'}`;$('#candles').append(e)}
+bi();rb();tick();
+</script></body></html>
